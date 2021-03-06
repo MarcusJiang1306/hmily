@@ -28,6 +28,8 @@ import com.alibaba.dubbo.rpc.RpcException;
 import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Optional;
+
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
@@ -48,6 +50,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author xiaoyu
  */
+@Slf4j
 @Activate(group = {Constants.CONSUMER})
 public class DubboHmilyTransactionFilter implements Filter {
     
@@ -55,6 +58,7 @@ public class DubboHmilyTransactionFilter implements Filter {
     
     @Override
     public Result invoke(final Invoker<?> invoker, final Invocation invocation) throws RpcException {
+        //拿出来context
         final HmilyTransactionContext context = HmilyContextHolder.get();
         if (Objects.isNull(context)) {
             return invoker.invoke(invocation);
@@ -66,6 +70,7 @@ public class DubboHmilyTransactionFilter implements Filter {
             Method method = clazz.getMethod(methodName, args);
             Hmily hmily = method.getAnnotation(Hmily.class);
             if (Objects.isNull(hmily)) {
+                //没有被注解hmily的会直接执行
                 return invoker.invoke(invocation);
             }
         } catch (Exception ex) {
@@ -78,6 +83,7 @@ public class DubboHmilyTransactionFilter implements Filter {
         final HmilyParticipant hmilyParticipant = buildParticipant(context, invoker, invocation);
         Optional.ofNullable(hmilyParticipant).ifPresent(participant -> context.setParticipantId(participant.getParticipantId()));
         if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
+            log.info("set participant refId");
             context.setParticipantRefId(participantId);
         }
         RpcMediator.getInstance().transmit(RpcContext.getContext()::setAttachment, context);
@@ -85,8 +91,10 @@ public class DubboHmilyTransactionFilter implements Filter {
         //if result has not exception
         if (!result.hasException()) {
             if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
+                log.info("拿到结果，role is PARTICIPANT");
                 HmilyTransactionHolder.getInstance().registerParticipantByNested(participantId, hmilyParticipant);
             } else {
+                log.info("拿到结果，role not PARTICIPANT");
                 HmilyTransactionHolder.getInstance().registerStarterParticipant(hmilyParticipant);
             }
         } else {
@@ -109,6 +117,7 @@ public class DubboHmilyTransactionFilter implements Filter {
         Class<?>[] args = invocation.getParameterTypes();
         final Object[] arguments = invocation.getArguments();
         HmilyInvocation hmilyInvocation = new HmilyInvocation(clazz, methodName, args, arguments);
+        log.info("participant invocation is: {}", hmilyInvocation.toString());
         hmilyParticipant.setConfirmHmilyInvocation(hmilyInvocation);
         hmilyParticipant.setCancelHmilyInvocation(hmilyInvocation);
         return hmilyParticipant;

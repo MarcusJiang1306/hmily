@@ -78,14 +78,20 @@ public final class HmilyTccTransactionExecutor {
     public HmilyTransaction preTry(final ProceedingJoinPoint point) {
         LogUtil.debug(LOGGER, () -> "......hmily tcc transaction starter....");
         //build tccTransaction
+        //初始化Transaction数据
         HmilyTransaction hmilyTransaction = createHmilyTransaction();
+        //把transaction给onData到Disruptor里面
         HmilyRepositoryStorage.createHmilyTransaction(hmilyTransaction);
+        //初始化参与者，应该是starter自己
         HmilyParticipant hmilyParticipant = buildHmilyParticipant(point, null, null, HmilyRoleEnum.START.getCode(), hmilyTransaction.getTransId());
+        //把hmilyParticipant给onData到Disruptor里面
         HmilyRepositoryStorage.createHmilyParticipant(hmilyParticipant);
+        //将hmilyParticipant注册上面的的transaction
         hmilyTransaction.registerParticipant(hmilyParticipant);
         //save tccTransaction in threadLocal
         HmilyTransactionHolder.getInstance().set(hmilyTransaction);
         //set TccTransactionContext this context transfer remote
+        //保存context
         HmilyTransactionContext context = new HmilyTransactionContext();
         //set action is try
         context.setAction(HmilyActionEnum.TRYING.getCode());

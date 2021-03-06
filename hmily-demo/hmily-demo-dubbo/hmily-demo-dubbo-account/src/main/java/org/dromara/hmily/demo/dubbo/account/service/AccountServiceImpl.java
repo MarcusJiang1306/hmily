@@ -17,6 +17,7 @@
 
 package org.dromara.hmily.demo.dubbo.account.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
@@ -41,6 +42,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author xiaoyu
  */
+@Slf4j
 @Service("accountService")
 public class AccountServiceImpl implements AccountService {
 
@@ -82,7 +84,9 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
     public boolean payment(AccountDTO accountDTO) {
-        return accountMapper.update(accountDTO) > 0;
+//        return accountMapper.update(accountDTO) > 0;
+        log.info("Account called");
+        return true;
     }
     
     @Override
@@ -198,9 +202,9 @@ public class AccountServiceImpl implements AccountService {
     @Transactional(rollbackFor = Exception.class)
     public boolean confirm(AccountDTO accountDTO) {
         LOGGER.info("============dubbo tcc 执行确认付款接口===============");
-        accountMapper.confirm(accountDTO);
-        final int i = confrimCount.incrementAndGet();
-        LOGGER.info("调用了account confirm " + i + " 次");
+//        accountMapper.confirm(accountDTO);
+//        final int i = confrimCount.incrementAndGet();
+//        LOGGER.info("调用了account confirm " + i + " 次");
         return Boolean.TRUE;
     }
     
@@ -213,8 +217,8 @@ public class AccountServiceImpl implements AccountService {
     @Transactional(rollbackFor = Exception.class)
     public boolean cancel(AccountDTO accountDTO) {
         LOGGER.info("============ dubbo tcc 执行取消付款接口===============");
-        final AccountDO accountDO = accountMapper.findByUserId(accountDTO.getUserId());
-        accountMapper.cancel(accountDTO);
+//        final AccountDO accountDO = accountMapper.findByUserId(accountDTO.getUserId());
+//        accountMapper.cancel(accountDTO);
         return Boolean.TRUE;
     }
 }

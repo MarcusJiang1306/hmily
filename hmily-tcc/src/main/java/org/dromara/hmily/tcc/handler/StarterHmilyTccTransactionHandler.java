@@ -49,6 +49,7 @@ public class StarterHmilyTccTransactionHandler implements HmilyTransactionHandle
     private DisruptorProviderManage<HmilyTransactionHandlerAlbum> disruptorProviderManage;
     
     public StarterHmilyTccTransactionHandler() {
+        //这个实际上要的是那个provider，里面实际上是初始化了一个disruptor，
         disruptorProviderManage = new DisruptorProviderManage<>(new HmilyTransactionExecutorHandler(),
                 Runtime.getRuntime().availableProcessors() << 1, DisruptorProviderManage.DEFAULT_SIZE);
         disruptorProviderManage.startup();
@@ -59,15 +60,19 @@ public class StarterHmilyTccTransactionHandler implements HmilyTransactionHandle
             throws Throwable {
         Object returnValue;
         Supplier<Boolean> histogramSupplier = null;
+        //默认加载了个MetricsTrackerHandlerFacade
         Optional<MetricsHandlerFacade> handlerFacade = MetricsHandlerFacadeEngine.load();
         try {
+            //但监控没开 所以counterIncrement是跳过的
             if (handlerFacade.isPresent()) {
                 handlerFacade.get().counterIncrement(MetricsLabelEnum.TRANSACTION_TOTAL.getName(), TransTypeEnum.TCC.name());
                 histogramSupplier = handlerFacade.get().histogramStartTimer(MetricsLabelEnum.TRANSACTION_LATENCY.getName(), TransTypeEnum.TCC.name());
             }
+            //创建Transaction
             HmilyTransaction hmilyTransaction = executor.preTry(point);
             try {
                 //execute try
+                //真正调用方法
                 returnValue = point.proceed();
                 hmilyTransaction.setStatus(HmilyActionEnum.TRYING.getCode());
                 executor.updateStartStatus(hmilyTransaction);

@@ -19,6 +19,8 @@
 package org.dromara.hmily.core.reflect;
 
 import java.util.Objects;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.dromara.hmily.common.enums.ExecutorTypeEnum;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
@@ -35,6 +37,7 @@ import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
  *
  * @author xiaoyu(Myth)
  */
+@Slf4j
 public class HmilyReflector {
     
     /**
@@ -50,6 +53,7 @@ public class HmilyReflector {
         setContext(action, hmilyParticipant);
         if (executorType == ExecutorTypeEnum.RPC && hmilyParticipant.getRole() != HmilyRoleEnum.START.getCode()) {
             if (action == HmilyActionEnum.CONFIRMING) {
+                log.info("Confirm invocation: {}", hmilyParticipant.getConfirmHmilyInvocation().toString());
                 return executeRpc(hmilyParticipant.getConfirmHmilyInvocation());
             } else {
                 return executeRpc(hmilyParticipant.getCancelHmilyInvocation());

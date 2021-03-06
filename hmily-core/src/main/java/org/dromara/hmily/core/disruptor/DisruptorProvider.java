@@ -58,6 +58,7 @@ public class DisruptorProvider<T> {
      * @param t the t
      */
     public void onData(final T t) {
+        logger.info("onData: {}", t.toString());
         long position = ringBuffer.next();
         try {
             DataEvent<T> de = ringBuffer.get(position);

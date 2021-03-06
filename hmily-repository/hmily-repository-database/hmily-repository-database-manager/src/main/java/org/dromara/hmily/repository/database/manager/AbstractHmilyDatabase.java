@@ -548,6 +548,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
      * @return the int
      */
     private int executeUpdate(final String sql, final Object... params) {
+        log.info("sql is: {}", sql);
         try (Connection con = dataSource.getConnection();
              PreparedStatement ps = createPreparedStatement(con, sql, params)) {
             return ps.executeUpdate();

@@ -18,6 +18,7 @@
 package org.dromara.hmily.demo.dubbo.inventory.service;
 
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
@@ -40,6 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author xiaoyu
  */
+@Slf4j
 @Service("inventoryService")
 public class InventoryServiceImpl implements InventoryService {
     
@@ -72,7 +74,9 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @HmilyTCC(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
     public Boolean decrease(InventoryDTO inventoryDTO) {
-        return inventoryMapper.decrease(inventoryDTO) > 0;
+//        return inventoryMapper.decrease(inventoryDTO) > 0;
+        log.info("Inventory called");
+        return true;
     }
     
     @Override
@@ -201,9 +205,9 @@ public class InventoryServiceImpl implements InventoryService {
      */
     public Boolean confirmMethod(InventoryDTO inventoryDTO) {
         LOGGER.info("==========调用扣减库存confirm方法===========");
-        inventoryMapper.confirm(inventoryDTO);
-        final int i = confirmCount.incrementAndGet();
-        LOGGER.info("调用了inventory confirm " + i + " 次");
+//        inventoryMapper.confirm(inventoryDTO);
+//        final int i = confirmCount.incrementAndGet();
+//        LOGGER.info("调用了inventory confirm " + i + " 次");
         return true;
     }
 
@@ -215,7 +219,7 @@ public class InventoryServiceImpl implements InventoryService {
      */
     public Boolean cancelMethod(InventoryDTO inventoryDTO) {
         LOGGER.info("==========调用扣减库存取消方法===========");
-        inventoryMapper.cancel(inventoryDTO);
+//        inventoryMapper.cancel(inventoryDTO);
         return true;
     }
 

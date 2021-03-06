@@ -18,6 +18,7 @@
 package org.dromara.hmily.demo.dubbo.order.service.impl;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
@@ -40,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author xiaoyu
  */
+@Slf4j
 @Service
 public class PaymentServiceImpl implements PaymentService {
     
@@ -63,7 +65,8 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public void makePayment(Order order) {
-        updateOrderStatus(order, OrderStatusEnum.PAYING);
+//        updateOrderStatus(order, OrderStatusEnum.PAYING);
+        log.info("payment called");
         //做库存和资金账户的检验工作 这里只是demo 。。。
        /* final AccountDO accountDO = accountService.findByUserId(order.getUserId());
         if (accountDO.getBalance().compareTo(order.getTotalAmount()) <= 0) {
@@ -131,7 +134,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public String mockPaymentInventoryWithTryException(Order order) {
-        updateOrderStatus(order, OrderStatusEnum.PAYING);
+//        updateOrderStatus(order, OrderStatusEnum.PAYING);
         //扣除用户余额
         accountService.payment(buildAccountDTO(order));
         inventoryService.mockWithTryException(buildInventoryDTO(order));
@@ -187,12 +190,12 @@ public class PaymentServiceImpl implements PaymentService {
     }
     
     public void confirmOrderStatus(Order order) {
-        updateOrderStatus(order, OrderStatusEnum.PAY_SUCCESS);
+//        updateOrderStatus(order, OrderStatusEnum.PAY_SUCCESS);
         LOGGER.info("=========进行订单confirm操作完成================");
     }
     
     public void cancelOrderStatus(Order order) {
-        updateOrderStatus(order, OrderStatusEnum.PAY_FAIL);
+//        updateOrderStatus(order, OrderStatusEnum.PAY_FAIL);
         LOGGER.info("=========进行订单cancel操作完成================");
     }
     

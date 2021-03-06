@@ -8,7 +8,7 @@ spring:
         driver-class-name:  com.mysql.jdbc.Driver
         url: jdbc:mysql://127.0.0.1:3306/hmily_account?useUnicode=true&characterEncoding=utf8
         username: root
-        password:
+        password: 1234
 
 mybatis:
   type-aliases-package: org.dromara.hmily.demo.common.account.entity
@@ -19,8 +19,9 @@ logging:
         root: error
         org.springframework.web: info
         org.apache.ibatis: debug
-        org.dromara.hmily.demo.bonuspoint: debug
-        org.dromara.hmily.demo.lottery: debug
-        org.dromara.hmily.demo: debug
+          #        org.dromara.hmily.demo.bonuspoint: debug
+          #        org.dromara.hmily.demo.lottery: debug
+          #        org.dromara.hmily.demo: debug
+        org.dromara.hmily: info
     path: "./logs"
 
